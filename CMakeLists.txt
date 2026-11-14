@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+project(ToyC LANGUAGES CXX)
+find_package(FLEX REQUIRED)
+FLEX_TARGET(ToyCLexer grammar/lexer.l "${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp")
+add_executable(compiler src/main.cpp ${FLEX_ToyCLexer_OUTPUTS})
+target_compile_features(compiler PRIVATE cxx_std_17)
+target_include_directories(compiler PRIVATE src)

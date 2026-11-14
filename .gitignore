@@ -1,0 +1,4 @@
+/build/
+/compiler
+/third_party/toyc/libtoyc.a
+/third_party/docs/*
