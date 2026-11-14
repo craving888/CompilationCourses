@@ -1,4 +1,5 @@
 #include "parser/semantic.hpp"
+#include "ir/ir.hpp"
 #include <iostream>
 #include <iterator>
 #include <string_view>
@@ -20,11 +21,11 @@ static void print_tokens(const Scan& scanned) {
 int main(int argc, char* argv[]) {
     const std::string_view mode = argc >= 2 ? argv[1] : "";
     if (argc == 2 && mode == "--help") {
-        std::cout << "Usage: ./compiler {-token|-ast} < input.c\n";
+        std::cout << "Usage: ./compiler {-token|-ast|-ir} < input.c\n";
         return 0;
     }
-    if (argc != 2 || (mode != "-token" && mode != "-ast")) {
-        std::cerr << "Usage: ./compiler {-token|-ast} < input.c\n";
+    if (argc != 2 || (mode != "-token" && mode != "-ast" && mode != "-ir")) {
+        std::cerr << "Usage: ./compiler {-token|-ast|-ir} < input.c\n";
         return 1;
     }
     const std::string source{std::istreambuf_iterator<char>(std::cin), {}};
@@ -35,6 +36,12 @@ int main(int argc, char* argv[]) {
     }
     auto program = parse(std::move(scanned));
     check_semantics(program);
+    if (mode == "-ir") {
+        for (const auto& e : program.errors) std::cerr << e.line << ' ' << e.message << '\n';
+        if (!program.errors.empty()) return 1;
+        ir::print(ir::lower(program), std::cout);
+        return 0;
+    }
     std::cout << (program.errors.empty() ? "accept\n" : "reject\n");
     for (const auto& e : program.errors) std::cout << e.line << ' ' << e.message << '\n';
 }
