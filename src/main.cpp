@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
         if (optimize) optimize_ir(module);
         std::ostringstream result;
         if (mode == "-ir") ir::print(module,result);
-        else emit_riscv(module,result);
+        else emit_riscv(module,result,optimize);
         std::cout << result.str();
     } catch (const std::exception& error) {
         std::cerr << error.what() << '\n';
