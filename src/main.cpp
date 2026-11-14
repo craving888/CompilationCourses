@@ -1,5 +1,6 @@
 #include "parser/semantic.hpp"
 #include "ir/ir.hpp"
+#include "optim/ir_opt.hpp"
 #include "codegen/riscv.hpp"
 #include <sstream>
 #include <iostream>
@@ -20,7 +21,7 @@ static void print_tokens(const Scan& scanned) {
     }
 }
 
-static constexpr const char* USAGE = "Usage: ./compiler {-token|-ast|-ir|-asm [-opt]} < input.c\n";
+static constexpr const char* USAGE = "Usage: ./compiler {-token|-ast|-ir [-opt]|-asm [-opt]} < input.c\n";
 int main(int argc, char* argv[]) {
     std::string_view mode;
     bool optimize = false;
@@ -34,7 +35,7 @@ int main(int argc, char* argv[]) {
         else if ((arg == "-token" || arg == "-ast" || arg == "-ir" || arg == "-asm") && mode.empty()) mode = arg;
         else { std::cerr << USAGE; return 1; }
     }
-    if (mode.empty() || (optimize && mode != "-asm")) { std::cerr << USAGE; return 1; }
+    if (mode.empty() || (optimize && mode != "-asm" && mode != "-ir")) { std::cerr << USAGE; return 1; }
 
     const std::string source{std::istreambuf_iterator<char>(std::cin), {}};
     auto scanned = scan(source);
@@ -52,6 +53,7 @@ int main(int argc, char* argv[]) {
     }
     try {
         auto module = ir::lower(program);
+        if (optimize) optimize_ir(module);
         std::ostringstream result;
         if (mode == "-ir") ir::print(module,result);
         else emit_riscv(module,result);
