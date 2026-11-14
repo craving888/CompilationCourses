@@ -80,6 +80,7 @@ struct Parser {
                 take(";");
             }
         }
+        b->close_line = peek().line;
         if (!take("}")) error("expected '}'");
         return b;
     }
@@ -149,6 +150,7 @@ struct Parser {
     }
 
     Program run() {
+        program.last_line = input.tokens.back().line;
         program.errors = std::move(input.errors);
         if (end() && program.errors.empty()) error("expected function definition");
         while (!end()) {

@@ -1,4 +1,4 @@
-#include "parser/ast.hpp"
+#include "parser/semantic.hpp"
 #include <iostream>
 #include <iterator>
 #include <string_view>
@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     auto program = parse(std::move(scanned));
+    check_semantics(program);
     std::cout << (program.errors.empty() ? "accept\n" : "reject\n");
     for (const auto& e : program.errors) std::cout << e.line << ' ' << e.message << '\n';
 }

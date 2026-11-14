@@ -12,6 +12,7 @@ struct Node {
     NodeKind kind;
     Token at;
     std::vector<Tree> children;
+    int close_line = 0;
 };
 struct Function {
     Token name;
@@ -22,5 +23,6 @@ struct Function {
 struct Program {
     std::vector<Function> functions;
     std::vector<Diagnostic> errors;
+    int last_line = 0;
 };
 Program parse(Scan scanned);
