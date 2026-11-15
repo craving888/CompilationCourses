@@ -19,7 +19,9 @@ utf ([\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF]{2}|[\xF0-\xF4][\x80-\xBF]{3})
 [ \t]+                             ;
 int|void|const|if|else|while|break|continue|return { token(Token::Word, yytext); }
 [_A-Za-z][_A-Za-z0-9]*             { token(Token::Ident, yytext); }
-0|[1-9][0-9]*                      { token(Token::Number, yytext); }
+ /* All-zero literals follow the course fixture. Do not accept 012 as one number. */
+0+/[1-9]                          { for (int i = 0; i < yyleng; ++i) token(Token::Number, "0"); }
+0+|[1-9][0-9]*                     { token(Token::Number, yytext); }
 "=="|"!="|"<="|">="|"&&"|"||"|[+*/%=<>!(){};,\-] { token(Token::Word, yytext); }
 {utf}|.                            { scanned.errors.push_back({line,"illegal character '" + std::string(yytext, yyleng) + "'"}); }
 %%
